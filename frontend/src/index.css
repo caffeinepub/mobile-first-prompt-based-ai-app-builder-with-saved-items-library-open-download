@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    
+    --background: 98% 0.01 280;
+    --foreground: 20% 0.02 280;
+    --card: 100% 0 0;
+    --card-foreground: 20% 0.02 280;
+    --popover: 100% 0 0;
+    --popover-foreground: 20% 0.02 280;
+    --primary: 55% 0.22 300;
+    --primary-foreground: 100% 0 0;
+    --secondary: 92% 0.03 280;
+    --secondary-foreground: 20% 0.02 280;
+    --muted: 94% 0.02 280;
+    --muted-foreground: 50% 0.02 280;
+    --accent: 90% 0.05 300;
+    --accent-foreground: 20% 0.02 280;
+    --destructive: 55% 0.22 25;
+    --destructive-foreground: 100% 0 0;
+    --border: 88% 0.02 280;
+    --input: 88% 0.02 280;
+    --ring: 55% 0.22 300;
+    --radius: 0.5rem;
+  }
+  
+  html {
+    color-scheme: light;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  button {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    overflow-x: hidden;
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "kind": "build_request",
+  "title": "Fix game prompt fidelity so generated games match the user's intent (e.g., Space Shooter)",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Improve game prompt intent detection so that when the user selects Creation Type = Game, the generated gameKind reliably matches the user’s prompt (specifically ensuring that prompts like “space shooter” produce a shooter-style game rather than a different template).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Main chahta hu ki main jo bhi prompt likhu wo wahi game mujhe bana kar de."
+        ]
+      },
+      "acceptanceCriteria": [
+        "With Creation Type set to Game and prompt containing “space shooter” (or “space shooter game”), generation selects the shooter template and the preview renders a shooter gameplay experience.",
+        "If the prompt strongly indicates a shooter (e.g., includes words like shoot/shooter/fire/gun), shooter intent takes precedence over more general “space/star/galaxy” intent.",
+        "If the prompt is in mixed language (e.g., Hindi + English) but includes the key English intent term (e.g., “shooter”), the correct template is selected."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add a user-visible explanation in the Game generation flow that shows what game kind was detected from the prompt (e.g., “Detected: Shooter”), and provide an explicit manual override control to select the desired game kind before generating (so the user can force “Shooter” even if detection fails).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "main space shooter game banane ka prompt de raha hu ye koi aur hi game bana raha hai"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On BuilderPage when Creation Type = Game, the UI displays the detected game kind derived from the current prompt.",
+        "The user can manually choose a game kind (runner/shooter/catch/puzzle/space) and generation uses that selection regardless of automatic detection.",
+        "If the user does not choose an override, automatic detection is used."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not edit files under frontend/src/components/ui (read-only UI component sources must be composed, not edited).",
+    "Keep all backend logic in the single Motoko actor (no new backend services)."
+  ],
+  "nonGoals": [
+    "Implementing real AI/LLM-based generation.",
+    "Adding new backend persistence fields or changing backend schemas for prompt generation.",
+    "Adding entirely new game runtimes beyond the existing 2D canvas runtime."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

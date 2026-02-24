@@ -1,0 +1,64 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Game prompt intent fidelity + detected kind display and manual override",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Strengthen game prompt intent detection so shooter-like prompts (e.g., “space shooter”) reliably select the shooter gameKind and render a shooter gameplay experience in preview.",
+      "acceptanceCriteria": [
+        "With Creation Type set to Game and prompt containing “space shooter” (or “space shooter game”), generation selects the shooter template and the preview renders a shooter gameplay experience.",
+        "If the prompt strongly indicates a shooter (e.g., includes words like shoot/shooter/fire/gun), shooter intent takes precedence over more general “space/star/galaxy” intent.",
+        "If the prompt is in mixed language (e.g., Hindi + English) but includes the key English intent term (e.g., “shooter”), the correct template is selected."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/generation/detectGameKind.ts",
+          "operation": "create",
+          "description": "Add a dedicated prompt-to-gameKind intent detector that scores/weights keywords and enforces shooter precedence over generic space terms (and over other weaker intents), returning both the detected kind and an optional explanation for UI/debugging."
+        },
+        {
+          "path": "frontend/src/generation/gameTemplates.ts",
+          "operation": "modify",
+          "description": "Update game template selection to use the new detector (instead of simple ordered includes checks) so prompts like “space shooter” reliably resolve to the shooter template, including mixed-language prompts that still contain key English shooter terms."
+        },
+        {
+          "path": "frontend/src/generation/templates.ts",
+          "operation": "modify",
+          "description": "Extend game generation routing to accept an optional resolved/overridden gameKind so the correct template can be selected deterministically (while keeping existing behavior for non-game creation types)."
+        },
+        {
+          "path": "frontend/src/components/runtime/GameRuntime2D.tsx",
+          "operation": "modify",
+          "description": "Enhance the existing 2D game runtime to render a distinct shooter gameplay loop when gameKind is 'shooter' (e.g., player ship movement + firing + enemy targets + bullet collisions + score/health), while preserving current behavior for other game kinds."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Show the detected game kind in the Game generation flow and allow a manual override that forces the selected game kind for generation.",
+      "acceptanceCriteria": [
+        "On BuilderPage when Creation Type = Game, the UI displays the detected game kind derived from the current prompt.",
+        "The user can manually choose a game kind (runner/shooter/catch/puzzle/space) and generation uses that selection regardless of automatic detection.",
+        "If the user does not choose an override, automatic detection is used."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/BuilderPage.tsx",
+          "operation": "modify",
+          "description": "Add Game-only UI that (1) computes and displays the detected gameKind from the current prompt and (2) provides a manual override control (runner/shooter/catch/puzzle/space + auto). Wire generate action to pass the override when set; otherwise use auto detection."
+        },
+        {
+          "path": "frontend/src/generation/templates.ts",
+          "operation": "modify",
+          "description": "Plumb the BuilderPage manual override through the generation entry point so game generation uses the override selection when present and falls back to automatic detection when not."
+        },
+        {
+          "path": "frontend/src/generation/detectGameKind.ts",
+          "operation": "modify",
+          "description": "Expose a small, UI-friendly API (e.g., detected label + optional rationale) so BuilderPage can show 'Detected: <Kind>' consistently with the same logic used for generation."
+        }
+      ]
+    }
+  ]
+}
