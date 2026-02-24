@@ -1,73 +1,169 @@
-import { Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
-import { useEffect } from 'react';
-import LoginButton from '../auth/LoginButton';
-import ProfileSetupModal from '../auth/ProfileSetupModal';
+import React, { useState } from 'react';
+import { useRouterState, useNavigate } from '@tanstack/react-router';
+import { Wand2, Library, Sparkles } from 'lucide-react';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
-import { Sparkles, FolderOpen } from 'lucide-react';
-import { Button } from '../ui/button';
+import ProfileSetupModal from '../auth/ProfileSetupModal';
+import LoginButton from '../auth/LoginButton';
 import { ErrorBoundary } from '../system/ErrorBoundary';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
-export function AppShell() {
+interface AppShellProps {
+  children: React.ReactNode;
+}
+
+const navItems = [
+  { path: '/', label: 'Builder', icon: Wand2 },
+  { path: '/my-creations', label: 'My Creations', icon: Library },
+];
+
+export default function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
-  const { isAuthenticated, userProfile, isLoading, isFetched } = useCurrentUser();
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const { isAuthenticated, displayName, isLoading, isFetched, userProfile } = useCurrentUser();
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
 
-  const showProfileSetup = isAuthenticated && !isLoading && isFetched && userProfile === null;
+  const userInitials = displayName
+    ? displayName.slice(0, 2).toUpperCase()
+    : '?';
 
-  // Force light mode by removing any dark class
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove('dark');
-    root.style.colorScheme = 'light';
-  }, []);
+  React.useEffect(() => {
+    if (isAuthenticated && isFetched && !isLoading && userProfile === null) {
+      setShowProfileSetup(true);
+    }
+  }, [isAuthenticated, isFetched, isLoading, userProfile]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="container flex h-16 items-center justify-between px-4">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white border-b border-border shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+          {/* Logo */}
+          <button
+            onClick={() => navigate({ to: '/' })}
+            className="flex items-center gap-2.5 group"
+          >
+            <div className="w-8 h-8 rounded-lg overflow-hidden shadow-sm ring-1 ring-border group-hover:ring-[var(--accent)] transition-all">
+              <img
+                src="/assets/generated/app-logo.dim_256x256.png"
+                alt="App Logo"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="font-display font-bold text-lg text-foreground tracking-tight">
+              CreatorAI
+            </span>
+            <span className="hidden sm:inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)]">
+              <Sparkles className="w-3 h-3" />
+              Beta
+            </span>
+          </button>
+
+          {/* Right side */}
           <div className="flex items-center gap-3">
-            <img
-              src="/assets/generated/caffeine-logo.dim_512x512.png"
-              alt="Logo"
-              className="h-8 w-8 object-contain"
-            />
-            <h1 className="text-lg font-bold">AI Builder</h1>
+            {isAuthenticated && displayName && (
+              <div className="hidden sm:flex items-center gap-2">
+                <Avatar className="w-7 h-7">
+                  <AvatarFallback className="text-xs font-semibold bg-[var(--accent)]/10 text-[var(--accent)]">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-medium text-foreground">{displayName}</span>
+              </div>
+            )}
+            <LoginButton />
           </div>
-          <LoginButton />
         </div>
       </header>
 
-      <main className="flex-1 container px-4 py-6 pb-24">
+      {/* Main content */}
+      <main className="flex-1 pb-20 md:pb-6">
         <ErrorBoundary>
-          <Outlet />
+          {children}
         </ErrorBoundary>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 safe-area-bottom">
-        <div className="container flex items-center justify-around h-16 px-4">
-          <Button
-            variant={currentPath === '/' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => navigate({ to: '/' })}
-            className="flex-col h-auto py-2 gap-1"
-          >
-            <Sparkles className="h-5 w-5" />
-            <span className="text-xs">Builder</span>
-          </Button>
-          <Button
-            variant={currentPath === '/my-creations' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => navigate({ to: '/my-creations' })}
-            className="flex-col h-auto py-2 gap-1"
-          >
-            <FolderOpen className="h-5 w-5" />
-            <span className="text-xs">My Creations</span>
-          </Button>
+      {/* Bottom Navigation (mobile) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border shadow-[0_-1px_8px_0_rgba(0,0,0,0.06)] md:hidden">
+        <div className="flex items-stretch h-16">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentPath === item.path;
+
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate({ to: item.path as '/' | '/my-creations' })}
+                className="flex-1 flex flex-col items-center justify-center gap-1 relative transition-colors"
+              >
+                {isActive && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-[var(--accent)]" />
+                )}
+                <Icon
+                  className={`w-5 h-5 transition-colors ${
+                    isActive ? 'text-[var(--accent)]' : 'text-muted-foreground'
+                  }`}
+                />
+                <span
+                  className={`text-xs font-medium transition-colors ${
+                    isActive ? 'text-[var(--accent)] font-semibold' : 'text-muted-foreground'
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </nav>
 
-      <ProfileSetupModal open={showProfileSetup} />
+      {/* Desktop floating nav */}
+      <div className="hidden md:flex fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+        <div className="flex items-center gap-1 bg-white border border-border rounded-full shadow-md px-2 py-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentPath === item.path;
+
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate({ to: item.path as '/' | '/my-creations' })}
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-[var(--accent)] text-white shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Profile Setup Modal */}
+      {showProfileSetup && (
+        <ProfileSetupModal onComplete={() => setShowProfileSetup(false)} />
+      )}
+
+      {/* Footer */}
+      <footer className="hidden md:block border-t border-border bg-white py-4 pb-24">
+        <div className="max-w-5xl mx-auto px-4 flex items-center justify-center">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} CreatorAI · Built with{' '}
+            <span className="text-red-500">♥</span> using{' '}
+            <a
+              href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname || 'creatorai')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-[var(--accent)] hover:underline"
+            >
+              caffeine.ai
+            </a>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

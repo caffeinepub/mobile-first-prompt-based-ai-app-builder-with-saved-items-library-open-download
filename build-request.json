@@ -1,53 +1,55 @@
 {
   "kind": "build_request",
-  "title": "Fix game prompt fidelity so generated games match the user's intent (e.g., Space Shooter)",
+  "title": "Fix app creation failure and invisible prompt input text",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Improve game prompt intent detection so that when the user selects Creation Type = Game, the generated gameKind reliably matches the user’s prompt (specifically ensuring that prompts like “space shooter” produce a shooter-style game rather than a different template).",
+      "text": "Fix the prompt/textarea input field on the BuilderPage so that typed text is clearly visible — ensure the text color contrasts properly against the input background in all themes (no dark-on-dark or invisible text).",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "Main chahta hu ki main jo bhi prompt likhu wo wahi game mujhe bana kar de."
+          "jaha par prompt likhte hai waha par main jo bhi likh raha ho dikhai nahi de raha wo sab dark dark hai"
         ]
       },
       "acceptanceCriteria": [
-        "With Creation Type set to Game and prompt containing “space shooter” (or “space shooter game”), generation selects the shooter template and the preview renders a shooter gameplay experience.",
-        "If the prompt strongly indicates a shooter (e.g., includes words like shoot/shooter/fire/gun), shooter intent takes precedence over more general “space/star/galaxy” intent.",
-        "If the prompt is in mixed language (e.g., Hindi + English) but includes the key English intent term (e.g., “shooter”), the correct template is selected."
+        "Text typed into the prompt textarea is clearly legible with sufficient contrast ratio (minimum 4.5:1) against the input background.",
+        "Placeholder text is also visible (slightly muted but not invisible).",
+        "The fix applies consistently in both light and dark mode if the app supports both."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add a user-visible explanation in the Game generation flow that shows what game kind was detected from the prompt (e.g., “Detected: Shooter”), and provide an explicit manual override control to select the desired game kind before generating (so the user can force “Shooter” even if detection fails).",
-      "target": "frontend",
+      "text": "Fix the app creation flow on the BuilderPage so that users can successfully generate and save a new creation — the generate/create button must trigger the generation pipeline, save the result to the backend, and navigate to the creation viewer without errors.",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "main space shooter game banane ka prompt de raha hu ye koi aur hi game bana raha hai"
+          "Main apne app main apps nahi create kar pa raha hu"
         ]
       },
       "acceptanceCriteria": [
-        "On BuilderPage when Creation Type = Game, the UI displays the detected game kind derived from the current prompt.",
-        "The user can manually choose a game kind (runner/shooter/catch/puzzle/space) and generation uses that selection regardless of automatic detection.",
-        "If the user does not choose an override, automatic detection is used."
+        "Selecting a creation type, entering a prompt, and clicking the generate button successfully generates a creation.",
+        "The generated creation is saved to the backend and appears in the user's library.",
+        "After successful creation, the user is navigated to the creation viewer page.",
+        "Appropriate loading state is shown during generation and saving.",
+        "Any error that occurs is surfaced to the user with a clear, readable error message."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (read-only UI component sources must be composed, not edited).",
-    "Keep all backend logic in the single Motoko actor (no new backend services)."
+    "Do not modify files listed in frontend.immutablePaths.",
+    "All Motoko logic must remain in the single backend/main.mo actor file."
   ],
   "nonGoals": [
-    "Implementing real AI/LLM-based generation.",
-    "Adding new backend persistence fields or changing backend schemas for prompt generation.",
-    "Adding entirely new game runtimes beyond the existing 2D canvas runtime."
+    "Redesigning the overall visual theme or layout.",
+    "Adding new creation types or generation features.",
+    "Changes to authentication or profile setup flow."
   ],
   "imageRequirements": {
     "required": [],

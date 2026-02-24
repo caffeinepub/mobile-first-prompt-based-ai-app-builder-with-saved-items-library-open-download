@@ -10,7 +10,7 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface Item {
+export interface AppCreation {
   'id' : string,
   'content' : string,
   'owner' : Principal,
@@ -20,22 +20,48 @@ export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
 export interface _SERVICE {
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
+    undefined
+  >,
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
+  >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'createItem' : ActorMethod<[string, string], undefined>,
-  'deleteItem' : ActorMethod<[string], undefined>,
+  'deleteAppCreation' : ActorMethod<[string], undefined>,
+  'generateAppCreation' : ActorMethod<[string, string], undefined>,
+  'getAppCreation' : ActorMethod<[string], [] | [AppCreation]>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
-  'getItem' : ActorMethod<[string], [] | [Item]>,
-  'getSharedItem' : ActorMethod<[string], [] | [Item]>,
+  'getSharedAppCreation' : ActorMethod<[string], [] | [AppCreation]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'listUserItems' : ActorMethod<[Principal], Array<Item>>,
+  'listUserAppCreations' : ActorMethod<[Principal], Array<AppCreation>>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'shareItem' : ActorMethod<[string], undefined>,
-  'unshareItem' : ActorMethod<[string], undefined>,
-  'updateItem' : ActorMethod<[string, string], undefined>,
+  'shareAppCreation' : ActorMethod<[string], undefined>,
+  'unshareAppCreation' : ActorMethod<[string], undefined>,
+  'updateAppCreation' : ActorMethod<[string, string], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

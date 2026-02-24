@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T08:24:44.167Z",
+  "generatedAt": "2026-02-24T19:29:24.406Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,48 +12,52 @@
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Improve game prompt intent detection so that when the user selects Creation Type = Game, the generated gameKind reliably matches the user’s prompt (specifically ensuring that prompts like “space shooter” produce a shooter-style game rather than a different template).",
+        "summary": "Fix the prompt/textarea input field on the BuilderPage so that typed text is clearly visible — ensure the text color contrasts properly against the input background in all themes (no dark-on-dark or invisible text).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/generation/detectGameKind.ts",
-          "frontend/src/generation/gameTemplates.ts",
-          "frontend/src/generation/templates.ts",
-          "frontend/src/components/runtime/GameRuntime2D.tsx"
+          "frontend/src/pages/BuilderPage.tsx",
+          "frontend/src/index.css"
         ],
         "matchedFiles": [
-          "frontend/src/generation/detectGameKind.ts",
-          "frontend/src/generation/gameTemplates.ts",
-          "frontend/src/generation/templates.ts",
-          "frontend/src/components/runtime/GameRuntime2D.tsx"
+          "frontend/src/pages/BuilderPage.tsx",
+          "frontend/src/index.css"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add a user-visible explanation in the Game generation flow that shows what game kind was detected from the prompt (e.g., “Detected: Shooter”), and provide an explicit manual override control to select the desired game kind before generating (so the user can force “Shooter” even if detection fails).",
+        "summary": "Fix the app creation flow on the BuilderPage so that users can successfully generate and save a new creation — the generate/create button must trigger the generation pipeline, save the result to the backend, and navigate to the creation viewer without errors.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/BuilderPage.tsx",
-          "frontend/src/generation/templates.ts",
-          "frontend/src/generation/detectGameKind.ts"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/system/AsyncState.tsx"
         ],
         "matchedFiles": [
           "frontend/src/pages/BuilderPage.tsx",
-          "frontend/src/generation/templates.ts",
-          "frontend/src/generation/detectGameKind.ts"
+          "frontend/src/hooks/useQueries.ts"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/runtime/GameRuntime2D.tsx",
-    "frontend/src/generation/detectGameKind.ts",
-    "frontend/src/generation/gameTemplates.ts",
-    "frontend/src/generation/templates.ts",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/library/CreationListItem.tsx",
+    "frontend/src/components/viewer/ViewerHeaderActions.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
     "frontend/src/pages/BuilderPage.tsx",
+    "frontend/src/pages/CreationViewerPage.tsx",
+    "frontend/src/pages/MyCreationsPage.tsx",
+    "frontend/src/pages/SharedViewerPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

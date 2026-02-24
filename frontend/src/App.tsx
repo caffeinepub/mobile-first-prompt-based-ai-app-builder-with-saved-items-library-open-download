@@ -1,13 +1,21 @@
-import { RouterProvider, createRouter, createRoute, createRootRoute } from '@tanstack/react-router';
-import { AppShell } from './components/layout/AppShell';
+import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import AppShell from './components/layout/AppShell';
 import BuilderPage from './pages/BuilderPage';
 import MyCreationsPage from './pages/MyCreationsPage';
 import CreationViewerPage from './pages/CreationViewerPage';
 import SharedViewerPage from './pages/SharedViewerPage';
 import DownloadedCreationViewerPage from './pages/DownloadedCreationViewerPage';
 
+function RootLayout() {
+  return (
+    <AppShell>
+      <Outlet />
+    </AppShell>
+  );
+}
+
 const rootRoute = createRootRoute({
-  component: AppShell,
+  component: RootLayout,
 });
 
 const indexRoute = createRoute({
@@ -41,11 +49,11 @@ const downloadedViewerRoute = createRoute({
 });
 
 const routeTree = rootRoute.addChildren([
-  indexRoute, 
-  myCreationsRoute, 
-  viewerRoute, 
+  indexRoute,
+  myCreationsRoute,
+  viewerRoute,
   sharedRoute,
-  downloadedViewerRoute
+  downloadedViewerRoute,
 ]);
 
 const router = createRouter({ routeTree });

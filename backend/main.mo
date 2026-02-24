@@ -1,19 +1,25 @@
 import Map "mo:core/Map";
 import Text "mo:core/Text";
-import Iter "mo:core/Iter";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
+import MixinStorage "blob-storage/Mixin";
+import Iter "mo:core/Iter";
+import Migration "migration";
 
+// Run migration when upgrading from previous version
+(with migration = Migration.run)
 actor {
+  // Initialize state for imported components
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+  include MixinStorage();
 
-  // User profile type
+  // User profiles
   public type UserProfile = {
     name : Text;
-    // Other user metadata if needed
+    // Additional fields can be added here
   };
 
   let userProfiles = Map.empty<Principal, UserProfile>();
@@ -42,41 +48,41 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Item management
-  type Item = {
+  // App creation management
+  type AppCreation = {
     id : Text;
     content : Text;
     owner : Principal;
     isShared : Bool;
   };
 
-  let items = Map.empty<Text, Item>();
+  let appCreations = Map.empty<Text, AppCreation>();
 
-  public shared ({ caller }) func createItem(id : Text, content : Text) : async () {
+  public shared ({ caller }) func generateAppCreation(id : Text, content : Text) : async () {
     if (caller.isAnonymous()) {
-      Runtime.trap("Unauthorized: Anonymous users cannot create items");
+      Runtime.trap("Unauthorized: Anonymous users cannot create apps");
     };
     if (content.isEmpty()) {
       Runtime.trap("Content cannot be empty");
     };
-    let newItem : Item = {
+    let newApp : AppCreation = {
       id;
       content;
       owner = caller;
       isShared = false;
     };
-    items.add(id, newItem);
+    appCreations.add(id, newApp);
   };
 
-  public query ({ caller }) func getItem(id : Text) : async ?Item {
+  public query ({ caller }) func getAppCreation(id : Text) : async ?AppCreation {
     if (caller.isAnonymous()) {
-      Runtime.trap("Unauthorized: Anonymous users cannot access private items");
+      Runtime.trap("Unauthorized: Anonymous users cannot access private apps");
     };
-    switch (items.get(id)) {
+    switch (appCreations.get(id)) {
       case (null) { null };
-      case (?item) {
-        if (item.owner == caller or item.isShared) {
-          ?item;
+      case (?app) {
+        if (app.owner == caller or app.isShared) {
+          ?app;
         } else {
           null;
         };
@@ -84,105 +90,105 @@ actor {
     };
   };
 
-  public query ({ caller }) func listUserItems(user : Principal) : async [Item] {
+  public query ({ caller }) func listUserAppCreations(user : Principal) : async [AppCreation] {
     if (caller.isAnonymous()) {
-      Runtime.trap("Unauthorized: Anonymous users cannot list items");
+      Runtime.trap("Unauthorized: Anonymous users cannot list apps");
     };
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only list your own items");
+      Runtime.trap("Unauthorized: Can only list your own apps");
     };
-    let userItems = items.values().filter(
-      func(item) {
-        item.owner == user;
+    let userApps = appCreations.values().filter(
+      func(app) {
+        app.owner == user;
       }
     );
-    userItems.toArray();
+    userApps.toArray();
   };
 
-  public shared ({ caller }) func updateItem(id : Text, newContent : Text) : async () {
+  public shared ({ caller }) func updateAppCreation(id : Text, newContent : Text) : async () {
     if (caller.isAnonymous()) {
-      Runtime.trap("Unauthorized: Anonymous users cannot update items");
+      Runtime.trap("Unauthorized: Anonymous users cannot update apps");
     };
-    switch (items.get(id)) {
-      case (null) { Runtime.trap("Item not found") };
-      case (?item) {
-        if (item.owner != caller) {
-          Runtime.trap("Unauthorized: Only the owner can update this item");
+    switch (appCreations.get(id)) {
+      case (null) { Runtime.trap("App not found") };
+      case (?app) {
+        if (app.owner != caller) {
+          Runtime.trap("Unauthorized: Only the owner can update this app");
         };
-        let updatedItem : Item = {
-          id = item.id;
+        let updatedApp : AppCreation = {
+          id = app.id;
           content = newContent;
-          owner = item.owner;
-          isShared = item.isShared;
+          owner = app.owner;
+          isShared = app.isShared;
         };
-        items.add(id, updatedItem);
+        appCreations.add(id, updatedApp);
       };
     };
   };
 
-  public shared ({ caller }) func deleteItem(id : Text) : async () {
+  public shared ({ caller }) func deleteAppCreation(id : Text) : async () {
     if (caller.isAnonymous()) {
-      Runtime.trap("Unauthorized: Anonymous users cannot delete items");
+      Runtime.trap("Unauthorized: Anonymous users cannot delete apps");
     };
-    switch (items.get(id)) {
-      case (null) { Runtime.trap("Item not found") };
-      case (?item) {
-        if (item.owner != caller) {
-          Runtime.trap("Unauthorized: Only the owner can delete this item");
+    switch (appCreations.get(id)) {
+      case (null) { Runtime.trap("App not found") };
+      case (?app) {
+        if (app.owner != caller) {
+          Runtime.trap("Unauthorized: Only the owner can delete this app");
         };
-        items.remove(id);
+        appCreations.remove(id);
       };
     };
   };
 
-  public shared ({ caller }) func shareItem(id : Text) : async () {
+  public shared ({ caller }) func shareAppCreation(id : Text) : async () {
     if (caller.isAnonymous()) {
-      Runtime.trap("Unauthorized: Anonymous users cannot share items");
+      Runtime.trap("Unauthorized: Anonymous users cannot share apps");
     };
-    switch (items.get(id)) {
-      case (null) { Runtime.trap("Item not found") };
-      case (?item) {
-        if (item.owner != caller) {
-          Runtime.trap("Unauthorized: Only the owner can share this item");
+    switch (appCreations.get(id)) {
+      case (null) { Runtime.trap("App not found") };
+      case (?app) {
+        if (app.owner != caller) {
+          Runtime.trap("Unauthorized: Only the owner can share this app");
         };
-        let updatedItem : Item = {
-          id = item.id;
-          content = item.content;
-          owner = item.owner;
+        let updatedApp : AppCreation = {
+          id = app.id;
+          content = app.content;
+          owner = app.owner;
           isShared = true;
         };
-        items.add(id, updatedItem);
+        appCreations.add(id, updatedApp);
       };
     };
   };
 
-  public shared ({ caller }) func unshareItem(id : Text) : async () {
+  public shared ({ caller }) func unshareAppCreation(id : Text) : async () {
     if (caller.isAnonymous()) {
-      Runtime.trap("Unauthorized: Anonymous users cannot unshare items");
+      Runtime.trap("Unauthorized: Anonymous users cannot unshare apps");
     };
-    switch (items.get(id)) {
-      case (null) { Runtime.trap("Item not found") };
-      case (?item) {
-        if (item.owner != caller) {
-          Runtime.trap("Unauthorized: Only the owner can unshare this item");
+    switch (appCreations.get(id)) {
+      case (null) { Runtime.trap("App not found") };
+      case (?app) {
+        if (app.owner != caller) {
+          Runtime.trap("Unauthorized: Only the owner can unshare this app");
         };
-        let updatedItem : Item = {
-          id = item.id;
-          content = item.content;
-          owner = item.owner;
+        let updatedApp : AppCreation = {
+          id = app.id;
+          content = app.content;
+          owner = app.owner;
           isShared = false;
         };
-        items.add(id, updatedItem);
+        appCreations.add(id, updatedApp);
       };
     };
   };
 
-  // Public shared item access - accessible to guests
-  public query ({ caller }) func getSharedItem(id : Text) : async ?Item {
-    switch (items.get(id)) {
+  // Public shared app access - accessible to guests
+  public query ({ caller }) func getSharedAppCreation(id : Text) : async ?AppCreation {
+    switch (appCreations.get(id)) {
       case (null) { null };
-      case (?item) {
-        if (item.isShared) { ?item } else { null };
+      case (?app) {
+        if (app.isShared) { ?app } else { null };
       };
     };
   };

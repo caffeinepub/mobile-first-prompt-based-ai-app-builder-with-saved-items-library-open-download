@@ -8,77 +8,167 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const _CaffeineStorageCreateCertificateResult = IDL.Record({
+  'method' : IDL.Text,
+  'blob_hash' : IDL.Text,
+});
+export const _CaffeineStorageRefillInformation = IDL.Record({
+  'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+});
+export const _CaffeineStorageRefillResult = IDL.Record({
+  'success' : IDL.Opt(IDL.Bool),
+  'topped_up_amount' : IDL.Opt(IDL.Nat),
+});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
-export const UserProfile = IDL.Record({ 'name' : IDL.Text });
-export const Item = IDL.Record({
+export const AppCreation = IDL.Record({
   'id' : IDL.Text,
   'content' : IDL.Text,
   'owner' : IDL.Principal,
   'isShared' : IDL.Bool,
 });
+export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 
 export const idlService = IDL.Service({
+  '_caffeineStorageBlobIsLive' : IDL.Func(
+      [IDL.Vec(IDL.Nat8)],
+      [IDL.Bool],
+      ['query'],
+    ),
+  '_caffeineStorageBlobsToDelete' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      ['query'],
+    ),
+  '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      [],
+      [],
+    ),
+  '_caffeineStorageCreateCertificate' : IDL.Func(
+      [IDL.Text],
+      [_CaffeineStorageCreateCertificateResult],
+      [],
+    ),
+  '_caffeineStorageRefillCashier' : IDL.Func(
+      [IDL.Opt(_CaffeineStorageRefillInformation)],
+      [_CaffeineStorageRefillResult],
+      [],
+    ),
+  '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'createItem' : IDL.Func([IDL.Text, IDL.Text], [], []),
-  'deleteItem' : IDL.Func([IDL.Text], [], []),
+  'deleteAppCreation' : IDL.Func([IDL.Text], [], []),
+  'generateAppCreation' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'getAppCreation' : IDL.Func([IDL.Text], [IDL.Opt(AppCreation)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-  'getItem' : IDL.Func([IDL.Text], [IDL.Opt(Item)], ['query']),
-  'getSharedItem' : IDL.Func([IDL.Text], [IDL.Opt(Item)], ['query']),
+  'getSharedAppCreation' : IDL.Func(
+      [IDL.Text],
+      [IDL.Opt(AppCreation)],
+      ['query'],
+    ),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'listUserItems' : IDL.Func([IDL.Principal], [IDL.Vec(Item)], ['query']),
+  'listUserAppCreations' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Vec(AppCreation)],
+      ['query'],
+    ),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-  'shareItem' : IDL.Func([IDL.Text], [], []),
-  'unshareItem' : IDL.Func([IDL.Text], [], []),
-  'updateItem' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'shareAppCreation' : IDL.Func([IDL.Text], [], []),
+  'unshareAppCreation' : IDL.Func([IDL.Text], [], []),
+  'updateAppCreation' : IDL.Func([IDL.Text, IDL.Text], [], []),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const _CaffeineStorageCreateCertificateResult = IDL.Record({
+    'method' : IDL.Text,
+    'blob_hash' : IDL.Text,
+  });
+  const _CaffeineStorageRefillInformation = IDL.Record({
+    'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+  });
+  const _CaffeineStorageRefillResult = IDL.Record({
+    'success' : IDL.Opt(IDL.Bool),
+    'topped_up_amount' : IDL.Opt(IDL.Nat),
+  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
-  const UserProfile = IDL.Record({ 'name' : IDL.Text });
-  const Item = IDL.Record({
+  const AppCreation = IDL.Record({
     'id' : IDL.Text,
     'content' : IDL.Text,
     'owner' : IDL.Principal,
     'isShared' : IDL.Bool,
   });
+  const UserProfile = IDL.Record({ 'name' : IDL.Text });
   
   return IDL.Service({
+    '_caffeineStorageBlobIsLive' : IDL.Func(
+        [IDL.Vec(IDL.Nat8)],
+        [IDL.Bool],
+        ['query'],
+      ),
+    '_caffeineStorageBlobsToDelete' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        ['query'],
+      ),
+    '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        [],
+        [],
+      ),
+    '_caffeineStorageCreateCertificate' : IDL.Func(
+        [IDL.Text],
+        [_CaffeineStorageCreateCertificateResult],
+        [],
+      ),
+    '_caffeineStorageRefillCashier' : IDL.Func(
+        [IDL.Opt(_CaffeineStorageRefillInformation)],
+        [_CaffeineStorageRefillResult],
+        [],
+      ),
+    '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'createItem' : IDL.Func([IDL.Text, IDL.Text], [], []),
-    'deleteItem' : IDL.Func([IDL.Text], [], []),
+    'deleteAppCreation' : IDL.Func([IDL.Text], [], []),
+    'generateAppCreation' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'getAppCreation' : IDL.Func([IDL.Text], [IDL.Opt(AppCreation)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-    'getItem' : IDL.Func([IDL.Text], [IDL.Opt(Item)], ['query']),
-    'getSharedItem' : IDL.Func([IDL.Text], [IDL.Opt(Item)], ['query']),
+    'getSharedAppCreation' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(AppCreation)],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'listUserItems' : IDL.Func([IDL.Principal], [IDL.Vec(Item)], ['query']),
+    'listUserAppCreations' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(AppCreation)],
+        ['query'],
+      ),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-    'shareItem' : IDL.Func([IDL.Text], [], []),
-    'unshareItem' : IDL.Func([IDL.Text], [], []),
-    'updateItem' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'shareAppCreation' : IDL.Func([IDL.Text], [], []),
+    'unshareAppCreation' : IDL.Func([IDL.Text], [], []),
+    'updateAppCreation' : IDL.Func([IDL.Text, IDL.Text], [], []),
   });
 };
 

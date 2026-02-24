@@ -1,76 +1,115 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { FileText, Download, Smartphone } from 'lucide-react';
+import React from 'react';
+import { Smartphone, Download, Code2, ExternalLink, X } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 interface AndroidDownloadHelpDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   onDownloadHtml: () => void;
-  onDownloadInstructions: () => void;
+  onDownloadAndroid: () => void;
 }
 
 export default function AndroidDownloadHelpDialog({
   open,
-  onOpenChange,
+  onClose,
   onDownloadHtml,
-  onDownloadInstructions
+  onDownloadAndroid,
 }: AndroidDownloadHelpDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Smartphone className="h-6 w-6 text-primary" />
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-md rounded-2xl p-0 overflow-hidden border border-border shadow-xl">
+        {/* Header */}
+        <DialogHeader className="px-6 pt-6 pb-4">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+              <Smartphone className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <DialogTitle>Android Export Options</DialogTitle>
-              <DialogDescription className="mt-1">
-                Choose how you'd like to use your creation on Android
+              <DialogTitle className="font-display text-lg font-bold text-foreground">
+                Android Export Options
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground mt-0.5">
+                Choose how you want to export your creation.
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
-        
-        <div className="space-y-4">
-          <div className="bg-muted rounded-lg p-4">
+
+        <Separator />
+
+        {/* Body */}
+        <div className="px-6 py-5 space-y-4">
+          {/* Recommended option */}
+          <div className="rounded-xl border-2 border-[var(--accent)]/30 bg-[var(--accent)]/5 p-4">
             <div className="flex items-start gap-3">
-              <Download className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-sm mb-1">Recommended: HTML Export</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Download as a standalone HTML file that works immediately in any browser. 
-                  Perfect for quick use on Android devices.
+              <div className="w-8 h-8 rounded-lg bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Download className="w-4 h-4 text-[var(--accent)]" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-semibold text-foreground">HTML Export</p>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--accent)] text-white">
+                    Recommended
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Download as an HTML file. Open instantly in any browser on Android — no setup required.
                 </p>
-                <Button onClick={onDownloadHtml} className="w-full" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Download HTML (Ready to Use)
-                </Button>
               </div>
             </div>
           </div>
 
-          <div className="bg-muted rounded-lg p-4">
+          {/* Advanced option */}
+          <div className="rounded-xl border border-border bg-muted/30 p-4">
             <div className="flex items-start gap-3">
-              <FileText className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-sm mb-1">Advanced: Setup Instructions</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Get step-by-step instructions for creating a native Android app using Android Studio. 
-                  Requires development tools and technical knowledge.
+              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Code2 className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-1">Android Project Setup</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Download setup instructions for wrapping your creation in a native Android WebView app. Requires Android Studio.
                 </p>
-                <Button onClick={onDownloadInstructions} variant="outline" className="w-full" size="sm">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Download Instructions
-                </Button>
               </div>
             </div>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)} className="w-full">
+        <Separator />
+
+        {/* Footer */}
+        <DialogFooter className="px-6 py-4 flex flex-col sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="rounded-xl border-border hover:border-muted-foreground transition-all text-sm"
+          >
             Cancel
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onDownloadAndroid}
+            className="rounded-xl border-border hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all text-sm"
+          >
+            <Code2 className="w-4 h-4 mr-2" />
+            Android Setup
+          </Button>
+          <Button
+            onClick={onDownloadHtml}
+            className="rounded-xl bg-[var(--accent)] hover:bg-[var(--primary)] text-white font-semibold shadow-md hover:shadow-lg transition-all text-sm"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download HTML
           </Button>
         </DialogFooter>
       </DialogContent>

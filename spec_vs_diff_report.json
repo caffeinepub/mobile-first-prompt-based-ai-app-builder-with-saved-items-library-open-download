@@ -1,56 +1,41 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T08:24:44.150Z",
-  "summary": "Implemented a new weighted keyword-based gameKind detector with shooter-precedence and wired it into the Game generation flow with (per summary) a detected-kind display and a manual override that is passed into generation. However, many unrelated auth/routing/error-handling changes also appear in the diff summary and were not requested by the BuildRequest.",
+  "generatedAt": "2026-02-24T19:29:24.403Z",
+  "summary": "Both REQ-1 and REQ-2 appear to be addressed in the diff. REQ-1 is fixed via explicit CSS rules in index.css forcing visible text/placeholder colors on input and textarea elements, plus explicit Tailwind classes on the BuilderPage textarea. REQ-2 is fixed via a reworked BuilderPage handleGenerate function that calls generateFromPrompt, saves to backend via useGenerateAppCreation, navigates to the viewer, shows loading state, and surfaces errors. The backend main.mo now has the generateAppCreation endpoint. No significant missing requirements were detected.",
   "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Added/modified authentication and profile setup UX (RequireAuth guard, LoginButton behavior, ProfileSetupModal) unrelated to game prompt fidelity.",
-      "reason": "BuildRequest focuses only on improving game prompt intent detection and adding detected-kind explanation + manual override in the Game flow; it does not request auth/profile UX changes.",
+      "description": "A migration module (backend/migration.mo) was added to handle data migration from an old 'items' map to a new 'appCreations' map, including a migration annotation in main.mo.",
+      "reason": "Neither REQ-1 nor REQ-2 requested a data migration module or any backend schema migration logic. This is additional infrastructure not mentioned in the build request.",
       "evidence": [
-        "frontend/src/components/auth/RequireAuth.tsx",
-        "frontend/src/components/auth/LoginButton.tsx",
-        "frontend/src/components/auth/ProfileSetupModal.tsx",
-        "frontend/src/hooks/useCurrentUser.ts"
+        "backend/migration.mo",
+        "backend/main.mo"
       ]
     },
     {
-      "description": "Added/modified routing and viewer/library pages (downloaded-creation viewer route, MyCreationsPage, CreationViewerPage, SharedViewerPage) unrelated to game prompt fidelity.",
-      "reason": "Not requested by REQ-1/REQ-2; scope is limited to game prompt detection and override UI.",
-      "evidence": [
-        "frontend/src/App.tsx",
-        "frontend/src/pages/MyCreationsPage.tsx",
-        "frontend/src/pages/CreationViewerPage.tsx",
-        "frontend/src/pages/SharedViewerPage.tsx"
-      ]
-    },
-    {
-      "description": "Extended non-game prompt generation logic (e.g., calculator/scientific calculator intent detection) unrelated to game prompt fidelity requirements.",
-      "reason": "BuildRequest only concerns gameKind detection/override for Creation Type = Game.",
-      "evidence": [
-        "frontend/src/generation/templates.ts"
-      ]
-    },
-    {
-      "description": "Broad defensive error-handling/React Query behavior changes across backend operations unrelated to requested game prompt fidelity improvements.",
-      "reason": "Not part of REQ-1/REQ-2 acceptance criteria.",
+      "description": "Share and unshare functionality (shareAppCreation, unshareAppCreation, getSharedAppCreation) was added or updated in the frontend hooks and components.",
+      "reason": "The build request only asks for fixing prompt visibility and fixing the creation flow. Share/unshare features are beyond the stated requirements.",
       "evidence": [
         "frontend/src/hooks/useQueries.ts",
-        "frontend/src/components/system/AsyncState.tsx",
         "frontend/src/components/library/CreationListItem.tsx",
         "frontend/src/components/viewer/ViewerHeaderActions.tsx"
       ]
     }
   ],
-  "confidence": 0.74,
+  "confidence": 0.72,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/runtime/GameRuntime2D.tsx",
-    "frontend/src/generation/detectGameKind.ts",
-    "frontend/src/generation/gameTemplates.ts",
-    "frontend/src/generation/templates.ts",
+    "frontend/src/components/library/CreationListItem.tsx",
+    "frontend/src/components/viewer/ViewerHeaderActions.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
     "frontend/src/pages/BuilderPage.tsx",
+    "frontend/src/pages/CreationViewerPage.tsx",
+    "frontend/src/pages/MyCreationsPage.tsx",
+    "frontend/src/pages/SharedViewerPage.tsx",
     "project_state.json"
   ]
 }

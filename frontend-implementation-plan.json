@@ -1,62 +1,54 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Game prompt intent fidelity + detected kind display and manual override",
+  "title": "Fix app creation failure and invisible prompt input text",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Strengthen game prompt intent detection so shooter-like prompts (e.g., “space shooter”) reliably select the shooter gameKind and render a shooter gameplay experience in preview.",
+      "summary": "Fix the prompt textarea input field on the BuilderPage so that typed text is clearly visible with proper contrast in all themes",
       "acceptanceCriteria": [
-        "With Creation Type set to Game and prompt containing “space shooter” (or “space shooter game”), generation selects the shooter template and the preview renders a shooter gameplay experience.",
-        "If the prompt strongly indicates a shooter (e.g., includes words like shoot/shooter/fire/gun), shooter intent takes precedence over more general “space/star/galaxy” intent.",
-        "If the prompt is in mixed language (e.g., Hindi + English) but includes the key English intent term (e.g., “shooter”), the correct template is selected."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/generation/detectGameKind.ts",
-          "operation": "create",
-          "description": "Add a dedicated prompt-to-gameKind intent detector that scores/weights keywords and enforces shooter precedence over generic space terms (and over other weaker intents), returning both the detected kind and an optional explanation for UI/debugging."
-        },
-        {
-          "path": "frontend/src/generation/gameTemplates.ts",
-          "operation": "modify",
-          "description": "Update game template selection to use the new detector (instead of simple ordered includes checks) so prompts like “space shooter” reliably resolve to the shooter template, including mixed-language prompts that still contain key English shooter terms."
-        },
-        {
-          "path": "frontend/src/generation/templates.ts",
-          "operation": "modify",
-          "description": "Extend game generation routing to accept an optional resolved/overridden gameKind so the correct template can be selected deterministically (while keeping existing behavior for non-game creation types)."
-        },
-        {
-          "path": "frontend/src/components/runtime/GameRuntime2D.tsx",
-          "operation": "modify",
-          "description": "Enhance the existing 2D game runtime to render a distinct shooter gameplay loop when gameKind is 'shooter' (e.g., player ship movement + firing + enemy targets + bullet collisions + score/health), while preserving current behavior for other game kinds."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Show the detected game kind in the Game generation flow and allow a manual override that forces the selected game kind for generation.",
-      "acceptanceCriteria": [
-        "On BuilderPage when Creation Type = Game, the UI displays the detected game kind derived from the current prompt.",
-        "The user can manually choose a game kind (runner/shooter/catch/puzzle/space) and generation uses that selection regardless of automatic detection.",
-        "If the user does not choose an override, automatic detection is used."
+        "Text typed into the prompt textarea is clearly legible with sufficient contrast ratio (minimum 4.5:1) against the input background.",
+        "Placeholder text is also visible (slightly muted but not invisible).",
+        "The fix applies consistently in both light and dark mode if the app supports both."
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/BuilderPage.tsx",
           "operation": "modify",
-          "description": "Add Game-only UI that (1) computes and displays the detected gameKind from the current prompt and (2) provides a manual override control (runner/shooter/catch/puzzle/space + auto). Wire generate action to pass the override when set; otherwise use auto detection."
+          "description": "Fix the textarea input field styling to ensure typed text has proper contrast against the background. Update the className or inline styles of the textarea element to use CSS custom properties that provide sufficient text-to-background contrast in both light and dark modes. Ensure the placeholder text color is also visible but slightly muted. Reference the color tokens defined in frontend/src/index.css to maintain consistency with the design system."
         },
         {
-          "path": "frontend/src/generation/templates.ts",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Plumb the BuilderPage manual override through the generation entry point so game generation uses the override selection when present and falls back to automatic detection when not."
+          "description": "Review and adjust the CSS custom properties for input/textarea text colors if needed to ensure a minimum 4.5:1 contrast ratio against input backgrounds in both light and dark modes. Add or update color token definitions (e.g., --input-text, --input-placeholder) to ensure visibility. Verify that dark mode input backgrounds do not cause dark-on-dark text."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Fix the app creation flow on the BuilderPage so that users can successfully generate and save a new creation and navigate to the creation viewer",
+      "acceptanceCriteria": [
+        "Selecting a creation type, entering a prompt, and clicking the generate button successfully generates a creation.",
+        "The generated creation is saved to the backend and appears in the user's library.",
+        "After successful creation, the user is navigated to the creation viewer page.",
+        "Appropriate loading state is shown during generation and saving.",
+        "Any error that occurs is surfaced to the user with a clear, readable error message."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/BuilderPage.tsx",
+          "operation": "modify",
+          "description": "Fix the app creation flow by ensuring the generate button handler correctly calls the generation pipeline (via frontend/src/generation/templates.ts), saves the result using the backend's generateAppCreation and updateAppCreation methods from useQueries, handles loading and error states properly, and navigates to the creation viewer page on success using TanStack Router. Ensure error messages are displayed clearly to the user using the AsyncState component or inline error UI. Verify that the loading state is shown during both generation and saving steps."
         },
         {
-          "path": "frontend/src/generation/detectGameKind.ts",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Expose a small, UI-friendly API (e.g., detected label + optional rationale) so BuilderPage can show 'Detected: <Kind>' consistently with the same logic used for generation."
+          "description": "Review the mutations for generateAppCreation and updateAppCreation to ensure they handle errors gracefully and return clear error messages. Verify that the mutations invalidate the relevant query cache keys (e.g., 'userCreations') on success so the user's library updates immediately. Ensure authorization errors are caught and normalized using frontend/src/services/errors.ts."
+        },
+        {
+          "path": "frontend/src/components/system/AsyncState.tsx",
+          "operation": "modify",
+          "description": "Ensure the AsyncState component renders error messages with sufficient contrast and readability. If the error text color is too dark or invisible, update the alert styling to use properly contrasted color tokens from the design system. This component is used in BuilderPage to display creation flow errors."
         }
       ]
     }

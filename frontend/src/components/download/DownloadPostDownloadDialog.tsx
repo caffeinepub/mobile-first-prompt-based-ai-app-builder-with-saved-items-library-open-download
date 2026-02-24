@@ -1,91 +1,116 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { CheckCircle2, ExternalLink, FileJson, FileCode, FileText } from 'lucide-react';
-import type { ExportFormat } from '../../utils/download';
+import React from 'react';
+import { Download, FileCode, FileJson, Smartphone, CheckCircle2, ExternalLink } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+
+type DownloadFormat = 'html' | 'json' | 'android';
 
 interface DownloadPostDownloadDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  filename: string;
-  onOpenFile: () => void;
-  format?: ExportFormat;
+  onClose: () => void;
+  format: DownloadFormat;
+  filename?: string;
+  onOpenInApp?: () => void;
 }
+
+const formatConfig: Record<DownloadFormat, { icon: React.ElementType; label: string; color: string; message: string }> = {
+  html: {
+    icon: FileCode,
+    label: 'HTML File',
+    color: 'bg-blue-50 border-blue-200 text-blue-600',
+    message: 'Your creation has been exported as an HTML file. Open it in any browser to view it.',
+  },
+  json: {
+    icon: FileJson,
+    label: 'JSON Export',
+    color: 'bg-amber-50 border-amber-200 text-amber-600',
+    message: 'Your creation data has been exported as JSON. You can import it back into the app.',
+  },
+  android: {
+    icon: Smartphone,
+    label: 'Android Setup',
+    color: 'bg-emerald-50 border-emerald-200 text-emerald-600',
+    message: 'Android setup instructions have been downloaded. Follow the guide to create your native app.',
+  },
+};
 
 export default function DownloadPostDownloadDialog({
   open,
-  onOpenChange,
+  onClose,
+  format,
   filename,
-  onOpenFile,
-  format = 'json'
+  onOpenInApp,
 }: DownloadPostDownloadDialogProps) {
-  const canOpenInApp = format === 'json';
-  
-  const getIcon = () => {
-    switch (format) {
-      case 'html':
-        return <FileCode className="h-8 w-8 text-muted-foreground shrink-0" />;
-      case 'android':
-        return <FileText className="h-8 w-8 text-muted-foreground shrink-0" />;
-      default:
-        return <FileJson className="h-8 w-8 text-muted-foreground shrink-0" />;
-    }
-  };
-
-  const getFormatLabel = () => {
-    switch (format) {
-      case 'html':
-        return 'HTML File';
-      case 'android':
-        return 'Android Setup';
-      default:
-        return 'JSON File';
-    }
-  };
+  const config = formatConfig[format] || formatConfig.html;
+  const FormatIcon = config.icon;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <CheckCircle2 className="h-6 w-6 text-primary" />
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-sm rounded-2xl p-0 overflow-hidden border border-border shadow-xl">
+        {/* Header */}
+        <DialogHeader className="px-6 pt-6 pb-4">
+          <div className="flex items-center gap-3 mb-1">
+            <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${config.color}`}>
+              <FormatIcon className="w-5 h-5" />
             </div>
             <div>
-              <DialogTitle>Download Complete</DialogTitle>
-              <DialogDescription className="mt-1">
-                {format === 'html' 
-                  ? 'Your file has been saved and opened in a new tab'
-                  : 'Your file has been saved to your device'}
+              <DialogTitle className="font-display text-lg font-bold text-foreground">
+                Download Complete
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground mt-0.5">
+                {config.label} ready
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
-        
-        <div className="bg-muted rounded-lg p-4 flex items-center gap-3">
-          {getIcon()}
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{filename}</p>
-            <p className="text-xs text-muted-foreground">{getFormatLabel()} • Saved to Downloads</p>
+
+        <Separator />
+
+        {/* Body */}
+        <div className="px-6 py-5">
+          {/* Success indicator */}
+          <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 mb-4">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-emerald-800">Successfully downloaded</p>
+              {filename && (
+                <p className="text-xs text-emerald-600 font-mono mt-0.5 truncate">{filename}</p>
+              )}
+            </div>
           </div>
+
+          <p className="text-sm text-muted-foreground leading-relaxed">{config.message}</p>
         </div>
 
-        {canOpenInApp ? (
-          <DialogFooter className="flex-col sm:flex-col gap-2">
-            <Button onClick={onOpenFile} className="w-full">
-              <ExternalLink className="h-4 w-4 mr-2" />
+        <Separator />
+
+        {/* Footer */}
+        <DialogFooter className="px-6 py-4 flex gap-2">
+          {onOpenInApp && format === 'json' && (
+            <Button
+              onClick={onOpenInApp}
+              variant="outline"
+              className="flex-1 rounded-xl border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)]/5 font-semibold text-sm transition-all"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
               Open in App
             </Button>
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full">
-              Close
-            </Button>
-          </DialogFooter>
-        ) : (
-          <DialogFooter>
-            <Button onClick={() => onOpenChange(false)} className="w-full">
-              Close
-            </Button>
-          </DialogFooter>
-        )}
+          )}
+          <Button
+            onClick={onClose}
+            className="flex-1 rounded-xl bg-[var(--accent)] hover:bg-[var(--primary)] text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all"
+          >
+            Done
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

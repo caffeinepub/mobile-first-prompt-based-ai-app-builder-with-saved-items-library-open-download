@@ -7,14 +7,14 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface Item {
+export interface UserProfile {
+    name: string;
+}
+export interface AppCreation {
     id: string;
     content: string;
     owner: Principal;
     isShared: boolean;
-}
-export interface UserProfile {
-    name: string;
 }
 export enum UserRole {
     admin = "admin",
@@ -23,17 +23,17 @@ export enum UserRole {
 }
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createItem(id: string, content: string): Promise<void>;
-    deleteItem(id: string): Promise<void>;
+    deleteAppCreation(id: string): Promise<void>;
+    generateAppCreation(id: string, content: string): Promise<void>;
+    getAppCreation(id: string): Promise<AppCreation | null>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
-    getItem(id: string): Promise<Item | null>;
-    getSharedItem(id: string): Promise<Item | null>;
+    getSharedAppCreation(id: string): Promise<AppCreation | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
-    listUserItems(user: Principal): Promise<Array<Item>>;
+    listUserAppCreations(user: Principal): Promise<Array<AppCreation>>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    shareItem(id: string): Promise<void>;
-    unshareItem(id: string): Promise<void>;
-    updateItem(id: string, newContent: string): Promise<void>;
+    shareAppCreation(id: string): Promise<void>;
+    unshareAppCreation(id: string): Promise<void>;
+    updateAppCreation(id: string, newContent: string): Promise<void>;
 }

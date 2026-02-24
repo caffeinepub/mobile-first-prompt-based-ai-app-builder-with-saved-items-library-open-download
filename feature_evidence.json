@@ -2,33 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-improve-game-prompt-intent-detection-so-that-when-the-user-selects-creation-type-game-the-generated-gamekind-reliably-matches-the-user-s-prompt-specifically-ensuring-that-prompts-like-space-shooter-produce-a-shooter-style-game-rather-than-a-different-template",
-      "featureTitle": "Improve game prompt intent detection so that when the user selects Creation Type = Game, the generated gameKind reliably matches the user’s prompt (specifically ensuring that prompts like “space shooter” produce a shooter-style game rather than a different template).",
+      "featureId": "feature-fix-the-prompt-textarea-input-field-on-the-builderpage-so-that-typed-text-is-clearly-visible-ensure-the-text-color-contrasts-properly-against-the-input-background-in-all-themes-no-dark-on-dark-or-invisible-text",
+      "featureTitle": "Fix the prompt/textarea input field on the BuilderPage so that typed text is clearly visible — ensure the text color contrasts properly against the input background in all themes (no dark-on-dark or invisible text).",
       "files": [
-        "frontend/src/components/runtime/GameRuntime2D.tsx",
-        "frontend/src/generation/detectGameKind.ts",
-        "frontend/src/generation/gameTemplates.ts",
-        "frontend/src/generation/templates.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-user-visible-explanation-in-the-game-generation-flow-that-shows-what-game-kind-was-detected-from-the-prompt-e-g-detected-shooter-and-provide-an-explicit-manual-override-control-to-select-the-desired-game-kind-before-generating-so-the-user-can-force-shooter-even-if-detection-fails",
-      "featureTitle": "Add a user-visible explanation in the Game generation flow that shows what game kind was detected from the prompt (e.g., “Detected: Shooter”), and provide an explicit manual override control to select the desired game kind before generating (so the user can force “Shooter” even if detection fails).",
-      "files": [
-        "frontend/src/generation/detectGameKind.ts",
-        "frontend/src/generation/templates.ts",
+        "frontend/src/index.css",
         "frontend/src/pages/BuilderPage.tsx"
       ],
       "components": [
@@ -37,7 +14,29 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-the-app-creation-flow-on-the-builderpage-so-that-users-can-successfully-generate-and-save-a-new-creation-the-generate-create-button-must-trigger-the-generation-pipeline-save-the-result-to-the-backend-and-navigate-to-the-creation-viewer-without-errors",
+      "featureTitle": "Fix the app creation flow on the BuilderPage so that users can successfully generate and save a new creation — the generate/create button must trigger the generation pipeline, save the result to the backend, and navigate to the creation viewer without errors.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/BuilderPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
         "REQ-2"

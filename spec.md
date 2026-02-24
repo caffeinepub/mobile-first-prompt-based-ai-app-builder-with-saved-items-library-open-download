@@ -1,11 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Improve game prompt fidelity so “Game” creations reliably match the user’s intended game kind (e.g., “space shooter” generates a shooter-style game).
+**Goal:** Fix two bugs on the BuilderPage: invisible/dark prompt input text and a broken app creation flow.
 
 **Planned changes:**
-- Refine prompt intent detection for Game creation so shooter-related keywords (shoot/shooter/fire/gun) take precedence over broader space-themed terms, including in mixed-language prompts that contain key English intent terms.
-- Update the Game generation UI to show the detected game kind from the current prompt (e.g., “Detected: Shooter”).
-- Add a manual game-kind override control (runner/shooter/catch/puzzle/space) that, when selected, forces generation to use the chosen kind; otherwise default to automatic detection.
+- Fix the prompt textarea text color so typed text is clearly visible with proper contrast against the input background in all themes
+- Ensure placeholder text in the prompt textarea is also visible (muted but not invisible)
+- Fix the app creation flow so that selecting a type, entering a prompt, and clicking generate successfully triggers generation, saves the result to the backend, and navigates to the creation viewer
+- Show a loading state during generation and saving
+- Display clear error messages if creation fails
 
-**User-visible outcome:** When generating a 2D game, users see which game kind was detected from their prompt and can manually override it so prompts like “space shooter” reliably produce a shooter gameplay preview.
+**User-visible outcome:** Users can type in the prompt field and see their text clearly, and can successfully create and save new apps that appear in their library.
