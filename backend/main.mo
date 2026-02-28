@@ -6,10 +6,10 @@ import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 import Iter "mo:core/Iter";
-import Migration "migration";
+
 
 // Run migration when upgrading from previous version
-(with migration = Migration.run)
+
 actor {
   // Initialize state for imported components
   let accessControlState = AccessControl.initState();

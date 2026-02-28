@@ -1,41 +1,25 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-24T19:29:24.403Z",
-  "summary": "Both REQ-1 and REQ-2 appear to be addressed in the diff. REQ-1 is fixed via explicit CSS rules in index.css forcing visible text/placeholder colors on input and textarea elements, plus explicit Tailwind classes on the BuilderPage textarea. REQ-2 is fixed via a reworked BuilderPage handleGenerate function that calls generateFromPrompt, saves to backend via useGenerateAppCreation, navigates to the viewer, shows loading state, and surfaces errors. The backend main.mo now has the generateAppCreation endpoint. No significant missing requirements were detected.",
-  "missing_requirements": [],
-  "hallucinated_features": [
+  "generatedAt": "2026-02-28T11:52:53.559Z",
+  "summary": "The diff addresses REQ-1 (ChatbotRuntime fix) and REQ-2 (templates.ts chatbot data generation) with clear evidence. REQ-3 (exportCreationHtml.ts audit/fix) shows no evidence of changes in the diff.",
+  "missing_requirements": [
     {
-      "description": "A migration module (backend/migration.mo) was added to handle data migration from an old 'items' map to a new 'appCreations' map, including a migration annotation in main.mo.",
-      "reason": "Neither REQ-1 nor REQ-2 requested a data migration module or any backend schema migration logic. This is additional infrastructure not mentioned in the build request.",
-      "evidence": [
-        "backend/migration.mo",
-        "backend/main.mo"
-      ]
-    },
-    {
-      "description": "Share and unshare functionality (shareAppCreation, unshareAppCreation, getSharedAppCreation) was added or updated in the frontend hooks and components.",
-      "reason": "The build request only asks for fixing prompt visibility and fixing the creation flow. Share/unshare features are beyond the stated requirements.",
-      "evidence": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/components/library/CreationListItem.tsx",
-        "frontend/src/components/viewer/ViewerHeaderActions.tsx"
-      ]
+      "id": "REQ-3",
+      "requirement": "Audit the chatbot HTML export in frontend/src/utils/exportCreationHtml.ts to ensure exported chatbot pages also correctly process user input and display bot responses, matching the in-app runtime behaviour.",
+      "reason": "The file frontend/src/utils/exportCreationHtml.ts does not appear in the diff at all — neither as a modified nor added file. There is no evidence that the exported HTML chatbot behaviour was fixed.",
+      "evidence": []
     }
   ],
-  "confidence": 0.72,
+  "hallucinated_features": [],
+  "confidence": 0.9,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/library/CreationListItem.tsx",
-    "frontend/src/components/viewer/ViewerHeaderActions.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/index.css",
+    "frontend/src/components/preview/CreationPreview.tsx",
+    "frontend/src/components/runtime/ChatbotRuntime.tsx",
+    "frontend/src/generation/templates.ts",
     "frontend/src/pages/BuilderPage.tsx",
-    "frontend/src/pages/CreationViewerPage.tsx",
-    "frontend/src/pages/MyCreationsPage.tsx",
-    "frontend/src/pages/SharedViewerPage.tsx",
+    "frontend/src/pages/DownloadedCreationViewerPage.tsx",
     "project_state.json"
   ]
 }

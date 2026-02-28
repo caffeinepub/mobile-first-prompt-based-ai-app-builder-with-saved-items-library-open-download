@@ -1,33 +1,42 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
+  "summary": "Chatbot application where created chatbots are not responding. User wants automatic issue detection and fixing.",
   "architectural_notes": [],
   "known_issues": [
-    "App creation is not working; users cannot create apps within the app",
-    "Prompt input area text is not visible (appears dark/invisible against background)"
+    "Created chatbots are not giving any response to users"
   ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-fix-the-prompt-textarea-input-field-on-the-builderpage-so-that-typed-text-is-clearly-visible-ensure-the-text-color-contrasts-properly-against-the-input-background-in-all-themes-no-dark-on-dark-or-invisible-text",
-      "title": "Fix the prompt/textarea input field on the BuilderPage so that typed text is clearly visible — ensure the text color contrasts properly against the input background in all themes (no dark-on-dark or invisible text).",
+      "id": "feature-fix-the-chatbotruntime-component-so-that-it-correctly-processes-user-messages-and-generates-bot-responses-the-bot-must-reply-to-every-user-message-including-when-no-keyword-trigger-matches-with-a-sensible-fallback-response-the-typing-indicator-must-appear-briefly-before-the-bot-response-is-shown",
+      "title": "Fix the ChatbotRuntime component so that it correctly processes user messages and generates bot responses. The bot must reply to every user message — including when no keyword trigger matches — with a sensible fallback response. The typing indicator must appear briefly before the bot response is shown.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-fix-the-app-creation-flow-on-the-builderpage-so-that-users-can-successfully-generate-and-save-a-new-creation-the-generate-create-button-must-trigger-the-generation-pipeline-save-the-result-to-the-backend-and-navigate-to-the-creation-viewer-without-errors",
-      "title": "Fix the app creation flow on the BuilderPage so that users can successfully generate and save a new creation — the generate/create button must trigger the generation pipeline, save the result to the backend, and navigate to the creation viewer without errors.",
+      "id": "feature-audit-the-chatbot-data-generation-logic-in-frontend-src-generation-templates-ts-to-ensure-that-when-a-chatbot-creation-is-generated-from-a-prompt-the-resulting-chatbotdata-object-includes-a-valid-non-empty-set-of-keyword-response-pairs-and-a-defined-fallback-response-string-fix-any-missing-or-malformed-fields",
+      "title": "Audit the chatbot data generation logic in frontend/src/generation/templates.ts to ensure that when a chatbot creation is generated from a prompt, the resulting ChatbotData object includes a valid, non-empty set of keyword–response pairs and a defined fallback response string. Fix any missing or malformed fields.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Fix app creation failure and invisible prompt input text",
+  "new_feature_requests": [
+    {
+      "id": "AR-3",
+      "summary": "Audit the chatbot HTML export in frontend/src/utils/exportCreationHtml.ts to ensure exported chatbot pages also correctly process user input and display bot responses, matching the in-app runtime behaviour.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "App Builder Studio",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

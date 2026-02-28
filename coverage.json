@@ -1,63 +1,60 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-24T19:29:24.406Z",
+  "generatedAt": "2026-02-28T11:52:53.561Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
+    "total": 3,
     "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Fix the prompt/textarea input field on the BuilderPage so that typed text is clearly visible — ensure the text color contrasts properly against the input background in all themes (no dark-on-dark or invisible text).",
+        "summary": "Fix the ChatbotRuntime component so that it correctly processes user messages and generates bot responses. The bot must reply to every user message — including when no keyword trigger matches — with a sensible fallback response. The typing indicator must appear briefly before the bot response is shown.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/BuilderPage.tsx",
-          "frontend/src/index.css"
+          "frontend/src/components/runtime/ChatbotRuntime.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/BuilderPage.tsx",
-          "frontend/src/index.css"
+          "frontend/src/components/runtime/ChatbotRuntime.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Fix the app creation flow on the BuilderPage so that users can successfully generate and save a new creation — the generate/create button must trigger the generation pipeline, save the result to the backend, and navigate to the creation viewer without errors.",
+        "summary": "Audit the chatbot data generation logic in frontend/src/generation/templates.ts to ensure that when a chatbot creation is generated from a prompt, the resulting ChatbotData object includes a valid, non-empty set of keyword–response pairs and a defined fallback response string. Fix any missing or malformed fields.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/BuilderPage.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/system/AsyncState.tsx"
+          "frontend/src/generation/templates.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/BuilderPage.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/generation/templates.ts"
         ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Audit the chatbot HTML export in frontend/src/utils/exportCreationHtml.ts to ensure exported chatbot pages also correctly process user input and display bot responses, matching the in-app runtime behaviour.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/utils/exportCreationHtml.ts"
+        ],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
+    "build-template/README.md",
+    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/library/CreationListItem.tsx",
-    "frontend/src/components/viewer/ViewerHeaderActions.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/index.css",
+    "frontend/src/components/preview/CreationPreview.tsx",
+    "frontend/src/components/runtime/ChatbotRuntime.tsx",
+    "frontend/src/generation/templates.ts",
     "frontend/src/pages/BuilderPage.tsx",
-    "frontend/src/pages/CreationViewerPage.tsx",
-    "frontend/src/pages/MyCreationsPage.tsx",
-    "frontend/src/pages/SharedViewerPage.tsx",
+    "frontend/src/pages/DownloadedCreationViewerPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

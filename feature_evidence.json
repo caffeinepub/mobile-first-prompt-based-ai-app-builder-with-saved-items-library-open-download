@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-prompt-textarea-input-field-on-the-builderpage-so-that-typed-text-is-clearly-visible-ensure-the-text-color-contrasts-properly-against-the-input-background-in-all-themes-no-dark-on-dark-or-invisible-text",
-      "featureTitle": "Fix the prompt/textarea input field on the BuilderPage so that typed text is clearly visible — ensure the text color contrasts properly against the input background in all themes (no dark-on-dark or invisible text).",
+      "featureId": "feature-fix-the-chatbotruntime-component-so-that-it-correctly-processes-user-messages-and-generates-bot-responses-the-bot-must-reply-to-every-user-message-including-when-no-keyword-trigger-matches-with-a-sensible-fallback-response-the-typing-indicator-must-appear-briefly-before-the-bot-response-is-shown",
+      "featureTitle": "Fix the ChatbotRuntime component so that it correctly processes user messages and generates bot responses. The bot must reply to every user message — including when no keyword trigger matches — with a sensible fallback response. The typing indicator must appear briefly before the bot response is shown.",
       "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/BuilderPage.tsx"
+        "frontend/src/components/runtime/ChatbotRuntime.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -23,11 +22,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-fix-the-app-creation-flow-on-the-builderpage-so-that-users-can-successfully-generate-and-save-a-new-creation-the-generate-create-button-must-trigger-the-generation-pipeline-save-the-result-to-the-backend-and-navigate-to-the-creation-viewer-without-errors",
-      "featureTitle": "Fix the app creation flow on the BuilderPage so that users can successfully generate and save a new creation — the generate/create button must trigger the generation pipeline, save the result to the backend, and navigate to the creation viewer without errors.",
+      "featureId": "feature-audit-the-chatbot-data-generation-logic-in-frontend-src-generation-templates-ts-to-ensure-that-when-a-chatbot-creation-is-generated-from-a-prompt-the-resulting-chatbotdata-object-includes-a-valid-non-empty-set-of-keyword-response-pairs-and-a-defined-fallback-response-string-fix-any-missing-or-malformed-fields",
+      "featureTitle": "Audit the chatbot data generation logic in frontend/src/generation/templates.ts to ensure that when a chatbot creation is generated from a prompt, the resulting ChatbotData object includes a valid, non-empty set of keyword–response pairs and a defined fallback response string. Fix any missing or malformed fields.",
       "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/BuilderPage.tsx"
+        "frontend/src/generation/templates.ts"
       ],
       "components": [
         "authorization@4.0.0",

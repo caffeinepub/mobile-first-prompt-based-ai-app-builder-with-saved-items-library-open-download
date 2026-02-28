@@ -1,54 +1,55 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix app creation failure and invisible prompt input text",
+  "title": "Fix chatbot runtime — bots not responding to user messages",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix the prompt textarea input field on the BuilderPage so that typed text is clearly visible with proper contrast in all themes",
+      "summary": "Fix the ChatbotRuntime component so that it correctly processes user messages and generates bot responses, including keyword matching, fallback responses, typing indicator, and message thread scrolling.",
       "acceptanceCriteria": [
-        "Text typed into the prompt textarea is clearly legible with sufficient contrast ratio (minimum 4.5:1) against the input background.",
-        "Placeholder text is also visible (slightly muted but not invisible).",
-        "The fix applies consistently in both light and dark mode if the app supports both."
+        "Typing a message and pressing Send or Enter always produces a bot reply",
+        "Keyword-matched responses return the correct configured reply",
+        "A fallback/default reply is shown when no keyword matches",
+        "The typing indicator appears for a short delay before the reply appears",
+        "The message thread scrolls to the latest message after each exchange",
+        "No JavaScript console errors are thrown during a chat interaction"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/BuilderPage.tsx",
+          "path": "frontend/src/components/runtime/ChatbotRuntime.tsx",
           "operation": "modify",
-          "description": "Fix the textarea input field styling to ensure typed text has proper contrast against the background. Update the className or inline styles of the textarea element to use CSS custom properties that provide sufficient text-to-background contrast in both light and dark modes. Ensure the placeholder text color is also visible but slightly muted. Reference the color tokens defined in frontend/src/index.css to maintain consistency with the design system."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Review and adjust the CSS custom properties for input/textarea text colors if needed to ensure a minimum 4.5:1 contrast ratio against input backgrounds in both light and dark modes. Add or update color token definitions (e.g., --input-text, --input-placeholder) to ensure visibility. Verify that dark mode input backgrounds do not cause dark-on-dark text."
+          "description": "Fix the bot response logic to correctly match user input against keyword triggers (case-insensitive), return the matched response, or fall back to the configured fallback response when no keyword matches. Ensure the typing indicator is displayed briefly before appending the bot's reply. Fix the message thread scrolling to always scroll to the latest message after each user-bot exchange. Handle empty or undefined responses array and fallback string gracefully. Verify that the component does not throw errors during chat interactions."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Fix the app creation flow on the BuilderPage so that users can successfully generate and save a new creation and navigate to the creation viewer",
+      "summary": "Audit and fix the chatbot data generation logic in frontend/src/generation/templates.ts to ensure generated ChatbotData objects include valid, non-empty keyword–response pairs and a defined fallback response string.",
       "acceptanceCriteria": [
-        "Selecting a creation type, entering a prompt, and clicking the generate button successfully generates a creation.",
-        "The generated creation is saved to the backend and appears in the user's library.",
-        "After successful creation, the user is navigated to the creation viewer page.",
-        "Appropriate loading state is shown during generation and saving.",
-        "Any error that occurs is surfaced to the user with a clear, readable error message."
+        "Generated chatbot data always contains at least one keyword–response entry",
+        "Generated chatbot data always contains a non-empty fallback response string",
+        "ChatbotRuntime can render and use the generated data without errors"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/BuilderPage.tsx",
+          "path": "frontend/src/generation/templates.ts",
           "operation": "modify",
-          "description": "Fix the app creation flow by ensuring the generate button handler correctly calls the generation pipeline (via frontend/src/generation/templates.ts), saves the result using the backend's generateAppCreation and updateAppCreation methods from useQueries, handles loading and error states properly, and navigates to the creation viewer page on success using TanStack Router. Ensure error messages are displayed clearly to the user using the AsyncState component or inline error UI. Verify that the loading state is shown during both generation and saving steps."
-        },
+          "description": "Audit the generateChatbotData function to ensure it always produces a ChatbotData object with at least one keyword–response pair in the responses array and a non-empty fallback string. Fix any logic that could result in an empty or undefined responses array or a missing/empty fallback. Ensure the generated data structure matches the shape expected by ChatbotRuntime (each response entry should have a keyword and reply field)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Audit and fix the chatbot HTML export in frontend/src/utils/exportCreationHtml.ts to ensure exported chatbot pages correctly process user input and display bot responses, matching the in-app runtime behaviour.",
+      "acceptanceCriteria": [
+        "Exported chatbot HTML file responds to typed messages",
+        "Keyword and fallback responses work correctly in the exported file"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/utils/exportCreationHtml.ts",
           "operation": "modify",
-          "description": "Review the mutations for generateAppCreation and updateAppCreation to ensure they handle errors gracefully and return clear error messages. Verify that the mutations invalidate the relevant query cache keys (e.g., 'userCreations') on success so the user's library updates immediately. Ensure authorization errors are caught and normalized using frontend/src/services/errors.ts."
-        },
-        {
-          "path": "frontend/src/components/system/AsyncState.tsx",
-          "operation": "modify",
-          "description": "Ensure the AsyncState component renders error messages with sufficient contrast and readability. If the error text color is too dark or invisible, update the alert styling to use properly contrasted color tokens from the design system. This component is used in BuilderPage to display creation flow errors."
+          "description": "Audit the chatbot HTML export logic to ensure the embedded JavaScript correctly processes user input, matches keywords (case-insensitive), returns the appropriate response, or falls back to the default response. Fix any discrepancies between the exported runtime logic and the in-app ChatbotRuntime component. Ensure the typing indicator, message appending, and scrolling behaviour match the in-app experience. Test that the exported HTML file can handle edge cases (empty responses array, missing fallback) gracefully."
         }
       ]
     }

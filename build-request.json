@@ -1,55 +1,76 @@
 {
   "kind": "build_request",
-  "title": "Fix app creation failure and invisible prompt input text",
+  "title": "Fix chatbot runtime — bots not responding to user messages",
+  "projectName": "App Builder Studio",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the prompt/textarea input field on the BuilderPage so that typed text is clearly visible — ensure the text color contrasts properly against the input background in all themes (no dark-on-dark or invisible text).",
+      "text": "Fix the ChatbotRuntime component so that it correctly processes user messages and generates bot responses. The bot must reply to every user message — including when no keyword trigger matches — with a sensible fallback response. The typing indicator must appear briefly before the bot response is shown.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-recent"
         ],
         "quotes": [
-          "jaha par prompt likhte hai waha par main jo bhi likh raha ho dikhai nahi de raha wo sab dark dark hai"
+          "Created chatbots koi response nahi de raha hai"
         ]
       },
       "acceptanceCriteria": [
-        "Text typed into the prompt textarea is clearly legible with sufficient contrast ratio (minimum 4.5:1) against the input background.",
-        "Placeholder text is also visible (slightly muted but not invisible).",
-        "The fix applies consistently in both light and dark mode if the app supports both."
+        "Typing a message and pressing Send or Enter always produces a bot reply",
+        "Keyword-matched responses return the correct configured reply",
+        "A fallback/default reply is shown when no keyword matches",
+        "The typing indicator appears for a short delay before the reply appears",
+        "The message thread scrolls to the latest message after each exchange",
+        "No JavaScript console errors are thrown during a chat interaction"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Fix the app creation flow on the BuilderPage so that users can successfully generate and save a new creation — the generate/create button must trigger the generation pipeline, save the result to the backend, and navigate to the creation viewer without errors.",
-      "target": "both",
+      "text": "Audit the chatbot data generation logic in frontend/src/generation/templates.ts to ensure that when a chatbot creation is generated from a prompt, the resulting ChatbotData object includes a valid, non-empty set of keyword–response pairs and a defined fallback response string. Fix any missing or malformed fields.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-recent"
         ],
         "quotes": [
-          "Main apne app main apps nahi create kar pa raha hu"
+          "Created chatbots koi response nahi de raha hai"
         ]
       },
       "acceptanceCriteria": [
-        "Selecting a creation type, entering a prompt, and clicking the generate button successfully generates a creation.",
-        "The generated creation is saved to the backend and appears in the user's library.",
-        "After successful creation, the user is navigated to the creation viewer page.",
-        "Appropriate loading state is shown during generation and saving.",
-        "Any error that occurs is surfaced to the user with a clear, readable error message."
+        "Generated chatbot data always contains at least one keyword–response entry",
+        "Generated chatbot data always contains a non-empty fallback response string",
+        "ChatbotRuntime can render and use the generated data without errors"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Audit the chatbot HTML export in frontend/src/utils/exportCreationHtml.ts to ensure exported chatbot pages also correctly process user input and display bot responses, matching the in-app runtime behaviour.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "Created chatbots koi response nahi de raha hai"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Exported chatbot HTML file responds to typed messages",
+        "Keyword and fallback responses work correctly in the exported file"
       ]
     }
   ],
   "constraints": [
-    "Do not modify files listed in frontend.immutablePaths.",
-    "All Motoko logic must remain in the single backend/main.mo actor file."
+    "Do not modify any file under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
+    "Do not change backend data models or Motoko actor interfaces",
+    "Preserve all existing creation types (app, website, image, game) — only fix chatbot behaviour"
   ],
   "nonGoals": [
-    "Redesigning the overall visual theme or layout.",
-    "Adding new creation types or generation features.",
-    "Changes to authentication or profile setup flow."
+    "Adding new chatbot features or AI/LLM integration",
+    "Redesigning the chatbot UI",
+    "Changes to authentication or user profile flows",
+    "Modifying non-chatbot creation types"
   ],
   "imageRequirements": {
     "required": [],

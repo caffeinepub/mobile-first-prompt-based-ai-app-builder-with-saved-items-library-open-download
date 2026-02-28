@@ -1,13 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Fix two bugs on the BuilderPage: invisible/dark prompt input text and a broken app creation flow.
+**Goal:** Fix the chatbot runtime so that created chatbots correctly respond to user messages both in-app and in exported HTML.
 
 **Planned changes:**
-- Fix the prompt textarea text color so typed text is clearly visible with proper contrast against the input background in all themes
-- Ensure placeholder text in the prompt textarea is also visible (muted but not invisible)
-- Fix the app creation flow so that selecting a type, entering a prompt, and clicking generate successfully triggers generation, saves the result to the backend, and navigates to the creation viewer
-- Show a loading state during generation and saving
-- Display clear error messages if creation fails
+- Fix the `ChatbotRuntime` component to process user messages and generate bot responses, including a typing indicator delay before each reply
+- Ensure a fallback response is shown when no keyword trigger matches
+- Auto-scroll the message thread to the latest message after each exchange
+- Audit and fix `ChatbotData` generation in `templates.ts` to always include at least one keyword–response pair and a non-empty fallback response string
+- Audit and fix the chatbot HTML export in `exportCreationHtml.ts` so exported chatbot pages also respond correctly to user input
 
-**User-visible outcome:** Users can type in the prompt field and see their text clearly, and can successfully create and save new apps that appear in their library.
+**User-visible outcome:** Users can open any created chatbot, type a message, and receive a bot reply every time — with a brief typing indicator — both inside the app and in exported HTML files.

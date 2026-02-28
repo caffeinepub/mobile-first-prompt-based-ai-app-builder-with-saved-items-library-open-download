@@ -17,7 +17,7 @@ export default function DownloadedCreationViewerPage() {
     try {
       const storedCreation = sessionStorage.getItem('lastDownloadedCreation');
       const storedFilename = sessionStorage.getItem('lastDownloadedFilename');
-      
+
       if (!storedCreation) {
         setError('No downloaded creation found. Please download a creation first.');
         return;
@@ -96,7 +96,7 @@ export default function DownloadedCreationViewerPage() {
               <strong>Prompt:</strong> {creation.prompt || 'No prompt available'}
             </p>
           </div>
-          
+
           <div className="border rounded-lg overflow-hidden">
             <CreationPreview type={creation.type} data={creation.data} />
           </div>

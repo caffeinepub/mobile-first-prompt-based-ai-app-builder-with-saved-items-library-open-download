@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useGenerateAppCreation } from '../hooks/useQueries';
-import { generateFromPrompt, type CreationType } from '../generation/templates';
+import { generateFromPrompt } from '../generation/templates';
+import type { CreationType } from '../generation/templates';
 import type { GameKind } from '../generation/detectGameKind';
 import RequireAuth from '../components/auth/RequireAuth';
 

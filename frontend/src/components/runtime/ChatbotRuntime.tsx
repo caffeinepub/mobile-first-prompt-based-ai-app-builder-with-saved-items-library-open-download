@@ -1,170 +1,195 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Send } from 'lucide-react';
 
-interface ChatbotData {
-  title?: string;
-  botName?: string;
-  greeting?: string;
-  responses?: Array<{ trigger: string; response: string }>;
-  fallback?: string;
-}
-
-interface Message {
+interface ChatMessage {
   id: string;
-  role: 'user' | 'bot';
   text: string;
+  isUser: boolean;
   timestamp: Date;
 }
 
-interface ChatbotRuntimeProps {
-  data?: ChatbotData;
+interface ResponseEntry {
+  trigger: string;
+  response: string;
 }
 
-function getBotResponse(input: string, data?: ChatbotData): string {
-  if (!data?.responses?.length) {
-    return data?.fallback || "I'm here to help! Could you tell me more?";
-  }
-  const lower = input.toLowerCase();
-  for (const { trigger, response } of data.responses) {
-    if (lower.includes(trigger.toLowerCase())) return response;
-  }
-  return data.fallback || "That's interesting! Could you elaborate?";
+interface ChatbotData {
+  botName?: string;
+  greeting?: string;
+  responses?: ResponseEntry[];
+  fallback?: string;
+}
+
+interface ChatbotRuntimeProps {
+  data: ChatbotData;
 }
 
 export default function ChatbotRuntime({ data }: ChatbotRuntimeProps) {
-  const botName = data?.botName || 'Assistant';
-  const greeting = data?.greeting || `Hi! I'm ${botName}. How can I help you today?`;
+  const botName = data?.botName || 'Bot';
+  const greeting = data?.greeting || 'Hello! How can I help you?';
+  const responses: ResponseEntry[] = Array.isArray(data?.responses) ? data.responses : [];
+  const fallback = (data?.fallback && data.fallback.trim()) ? data.fallback : "I'm not sure how to answer that. Could you rephrase your question?";
 
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '0', role: 'bot', text: greeting, timestamp: new Date() },
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [
+    {
+      id: 'greeting-0',
+      text: greeting,
+      isUser: false,
+      timestamp: new Date(),
+    },
   ]);
-  const [input, setInput] = useState('');
+  const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Reset messages when the chatbot data changes (new bot generated)
+  const greetingRef = useRef(greeting);
+  useEffect(() => {
+    if (greetingRef.current !== greeting) {
+      greetingRef.current = greeting;
+      setMessages([
+        {
+          id: 'greeting-' + Date.now(),
+          text: greeting,
+          isUser: false,
+          timestamp: new Date(),
+        },
+      ]);
+      setInputText('');
+      setIsTyping(false);
+    }
+  }, [greeting]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const sendMessage = async () => {
-    const text = input.trim();
-    if (!text || isTyping) return;
-    setInput('');
+  const getBotResponse = useCallback(
+    (userInput: string): string => {
+      const lower = userInput.toLowerCase().trim();
+      if (!lower) return fallback;
+      if (!responses || responses.length === 0) return fallback;
 
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', text, timestamp: new Date() };
+      for (const entry of responses) {
+        if (!entry || !entry.trigger) continue;
+        const triggerStr = String(entry.trigger).toLowerCase();
+        // Split on commas and/or whitespace
+        const keywords = triggerStr.split(/[\s,]+/).filter(kw => kw.length > 0);
+        if (keywords.some(kw => lower.includes(kw))) {
+          const reply = entry.response ? String(entry.response).trim() : '';
+          return reply || fallback;
+        }
+      }
+      return fallback;
+    },
+    [responses, fallback]
+  );
+
+  const handleSend = useCallback(() => {
+    const text = inputText.trim();
+    if (!text || isTyping) return;
+
+    const userMsg: ChatMessage = {
+      id: 'user-' + Date.now(),
+      text,
+      isUser: true,
+      timestamp: new Date(),
+    };
+
     setMessages(prev => [...prev, userMsg]);
+    setInputText('');
     setIsTyping(true);
 
-    await new Promise(r => setTimeout(r, 800 + Math.random() * 600));
+    const delay = 700 + Math.random() * 500;
+    setTimeout(() => {
+      const botReply = getBotResponse(text);
+      const botMsg: ChatMessage = {
+        id: 'bot-' + (Date.now() + 1),
+        text: botReply,
+        isUser: false,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, botMsg]);
+      setIsTyping(false);
+    }, delay);
+  }, [inputText, isTyping, getBotResponse]);
 
-    const botText = getBotResponse(text, data);
-    const botMsg: Message = { id: (Date.now() + 1).toString(), role: 'bot', text: botText, timestamp: new Date() };
-    setMessages(prev => [...prev, botMsg]);
-    setIsTyping(false);
-    inputRef.current?.focus();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      handleSend();
     }
   };
 
   return (
-    <div className="flex flex-col h-[500px] bg-muted/20">
-      {/* Chat Header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-border">
-        <div className="w-9 h-9 rounded-full bg-[var(--accent)]/10 flex items-center justify-center">
-          <Bot className="w-5 h-5 text-[var(--accent)]" />
+    <div className="flex flex-col bg-white" style={{ height: '100%', minHeight: 400 }}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-gray-50 shrink-0">
+        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
+          {botName.charAt(0).toUpperCase()}
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground">{botName}</p>
-          <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-            Online
-          </p>
+          <p className="font-semibold text-gray-900 text-sm">{botName}</p>
+          <p className="text-xs text-green-500">Online</p>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-          >
-            {/* Avatar */}
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-              msg.role === 'user'
-                ? 'bg-[var(--accent)] text-white'
-                : 'bg-muted border border-border text-muted-foreground'
-            }`}>
-              {msg.role === 'user'
-                ? <User className="w-3.5 h-3.5" />
-                : <Bot className="w-3.5 h-3.5" />
-              }
-            </div>
-
-            {/* Bubble */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+        {messages.map(msg => (
+          <div key={msg.id} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
             <div
-              className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm ${
-                msg.role === 'user'
-                  ? 'bg-[var(--accent)] text-white rounded-br-sm'
-                  : 'bg-white border border-border text-foreground rounded-bl-sm'
+              className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                msg.isUser
+                  ? 'bg-blue-500 text-white rounded-br-sm'
+                  : 'bg-gray-100 text-gray-800 rounded-bl-sm'
               }`}
             >
               {msg.text}
             </div>
           </div>
         ))}
-
-        {/* Typing indicator */}
         {isTyping && (
-          <div className="flex items-end gap-2">
-            <div className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
-              <Bot className="w-3.5 h-3.5 text-muted-foreground" />
-            </div>
-            <div className="bg-white border border-border rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
-              <div className="flex gap-1 items-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="flex justify-start">
+            <div className="bg-gray-100 px-3 py-2 rounded-2xl rounded-bl-sm">
+              <div className="flex gap-1 items-center h-5">
+                <span
+                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: '0ms' }}
+                />
+                <span
+                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: '150ms' }}
+                />
+                <span
+                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: '300ms' }}
+                />
               </div>
             </div>
           </div>
         )}
-        <div ref={bottomRef} />
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Row */}
-      <div className="px-4 py-3 bg-white border-t border-border">
-        <div className="flex items-center gap-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            className="flex-1 h-10 px-4 rounded-xl border border-border bg-muted/40 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all"
-            disabled={isTyping}
-          />
-          <Button
-            onClick={sendMessage}
-            disabled={!input.trim() || isTyping}
-            size="sm"
-            className="h-10 w-10 p-0 rounded-xl bg-[var(--accent)] hover:bg-[var(--primary)] text-white shadow-sm transition-all disabled:opacity-50"
-          >
-            {isTyping ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
-          </Button>
-        </div>
+      {/* Input */}
+      <div className="px-4 py-3 border-t border-gray-200 bg-white flex gap-2 shrink-0">
+        <input
+          type="text"
+          value={inputText}
+          onChange={e => setInputText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type a message..."
+          disabled={isTyping}
+          className="flex-1 px-3 py-2 rounded-full border border-gray-300 text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:border-blue-400 disabled:opacity-60"
+        />
+        <button
+          onClick={handleSend}
+          disabled={!inputText.trim() || isTyping}
+          className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white disabled:opacity-40 hover:bg-blue-600 transition-colors shrink-0"
+        >
+          <Send size={16} />
+        </button>
       </div>
     </div>
   );
